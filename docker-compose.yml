@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kliktravel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kliktravel
+      POSTGRES_PASSWORD: kliktravel
+      POSTGRES_DB: kliktravel
+    ports:
+      - "5432:5432"
+    volumes:
+      - kliktravel_pg:/var/lib/postgresql/data
+
+volumes:
+  kliktravel_pg:

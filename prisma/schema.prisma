@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+}
+
+enum PrivateTripStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  phone        String?  @unique
+  passwordHash String
+  fullName     String
+  role         UserRole @default(ADMIN)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  resetTokens PasswordResetToken[]
+
+  @@index([role])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Region destination (e.g. Indonesia, Thailand) — matches RegionDestination
+model Region {
+  id                    String   @id @default(cuid())
+  key                   String   @unique
+  slug                  String   @unique
+  featuredImageGradient String
+  nameId                String
+  nameEn                String
+  subtitleId            String
+  subtitleEn            String
+  sortOrder             Int      @default(0)
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  subDestinations SubDestination[]
+}
+
+/// Sub-destination under a region (e.g. Bali, Tokyo)
+model SubDestination {
+  id        String @id @default(cuid())
+  regionId  String
+  slug      String
+  nameId    String
+  nameEn    String
+  sortOrder Int    @default(0)
+
+  region Region @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@unique([regionId, slug])
+  @@index([slug])
+}
+
+/// Curated journey — matches Journey (+ bilingual content)
+model Journey {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  durationDays   Int
+  priceRaw       Decimal  @db.Decimal(14, 2)
+  countriesCount Int      @default(1)
+  image          String
+  imageGradient  String?
+  gallery        Json?
+  contentId      Json
+  contentEn      Json
+  sortOrder      Int      @default(0)
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+/// Open trip / tour package — matches TourPackageDetail
+model OpenTrip {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  featuredImage String
+  gallery       Json?
+  contentId     Json
+  contentEn     Json
+  sortOrder     Int      @default(0)
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+/// Journal article — matches JournalArticle
+model JournalArticle {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  image       String
+  categoryID  String
+  categoryEN  String
+  titleID     String
+  titleEN     String
+  excerptID   String   @db.Text
+  excerptEN   String   @db.Text
+  contentID   String   @db.Text
+  contentEN   String   @db.Text
+  dateID      String
+  dateEN      String
+  readTimeID  String
+  readTimeEN  String
+  featured    Boolean  @default(false)
+  gallery     Json?
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Testimonial — matches admin testimonials shape
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  rating    Int      @default(5)
+  reviewID  String   @db.Text
+  reviewEN  String   @db.Text
+  trip      String
+  approved  Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Private trip inquiry — matches PrivateTripInquiry
+model PrivateTripRequest {
+  id          String            @id @default(cuid())
+  name        String
+  phone       String
+  destination String
+  dates       String
+  guests      String
+  budget      String?
+  notes       String?           @db.Text
+  status      PrivateTripStatus @default(NEW)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String?
+  mimeType  String?
+  createdAt DateTime @default(now())
+}
