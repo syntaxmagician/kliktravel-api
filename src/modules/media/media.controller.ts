@@ -1,6 +1,9 @@
 import {
   BadRequestException,
   Controller,
+  Get,
+  NotFoundException,
+  Param,
   Post,
   UploadedFile,
   UseGuards,
@@ -28,6 +31,22 @@ export class MediaController {
     private prisma: PrismaService,
     private config: ConfigService,
   ) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List media assets' })
+  findAll() {
+    return this.prisma.mediaAsset.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Detail media asset' })
+  async findOne(@Param('id') id: string) {
+    const row = await this.prisma.mediaAsset.findUnique({ where: { id } });
+    if (!row) throw new NotFoundException('Media tidak ditemukan');
+    return row;
+  }
 
   @Post('upload')
   @ApiOperation({ summary: 'Upload gambar' })

@@ -15,7 +15,7 @@ Swagger: `/docs`
 | Testimonials | `GET /testimonials` | CRUD `/admin/testimonials` |
 | Private trip inquiries | `POST /private-trip-requests` | GET/PATCH/DELETE `/admin/private-trips` |
 | Settings | `GET /settings/public` | GET/PUT `/admin/settings` |
-| Media upload | — | `POST /admin/media/upload` |
+| Media | — | `GET /admin/media`, `GET /admin/media/:id`, `POST /admin/media/upload` |
 | Auth | `POST /auth/login` | `GET /auth/me` |
 
 Response publik destinations/journeys/open-trips mengikuti shape TypeScript di frontend (`RegionDestination`, `Journey`, `TourPackageDetail`).
