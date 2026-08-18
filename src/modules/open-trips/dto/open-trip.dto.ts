@@ -45,6 +45,11 @@ export class CreateOpenTripDto {
   @IsOptional()
   @IsBoolean()
   isPublished?: boolean;
+
+  @ApiPropertyOptional({ example: 'Available', enum: ['Available', 'Closed', 'Draft'] })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }
 
 export class UpdateOpenTripDto extends PartialType(CreateOpenTripDto) {}

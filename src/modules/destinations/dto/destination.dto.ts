@@ -78,6 +78,11 @@ export class CreateRegionDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ example: 'Active', enum: ['Active', 'Draft', 'Nonaktif'] })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }
 
 export class UpdateRegionDto extends PartialType(CreateRegionDto) {}
